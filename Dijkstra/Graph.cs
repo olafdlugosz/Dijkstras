@@ -69,8 +69,8 @@ namespace Dijkstra
                         Console.WriteLine(pathstep.Location + ":" + pathstep.PreviousStep);
                     }
                     var path = PrintShortestPath(end, start, "");
-                    path.Reverse();
-                    Console.WriteLine($"Shortest path from {start} to {end} is: {end}-->{path}");
+                    //path.Reverse();
+                    Console.WriteLine($"Shortest path from {start} to {end} is: {end}<--{path}");
                     break;
                 };
                 if (lowest != null || Distances
@@ -113,7 +113,7 @@ namespace Dijkstra
                 return path.Remove(path.Length - 3);               
             };
             var endNode = PathSteps.Where(x => x.Location == end).FirstOrDefault();
-            path += endNode.PreviousStep + "-->";
+            path += endNode.PreviousStep + "<--";
             return PrintShortestPath(endNode.PreviousStep, start, path);
 
         }
