@@ -34,7 +34,7 @@ namespace Dijkstra
             Console.WriteLine("====");
             foreach (var item in g.Vertexes.Values) {
                 foreach (var edge in item.Edges) {
-                    Console.WriteLine(item.Name + "=" + edge.Key + "-" + edge.Value);
+                    Console.WriteLine(item.Name + "=" + edge.Node + "-" + edge.Distance);
                 }
             }
             Console.WriteLine("===");

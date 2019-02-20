@@ -10,21 +10,21 @@ namespace Dijkstra
         public Dictionary<string, Node> Vertexes { get; set; }
         public List<NodeDistance> Distances { get; set; }
         public List<NodePriority> PriorityQueue { get; set; }
-        public List<KeyValuePair<string, string>> Previous { get; set; }
+        public List<PathStep> PathSteps { get; set; }
         public Graph() {
             Vertexes = new Dictionary<string, Node>();
             Distances = new List<NodeDistance>();
             PriorityQueue = new List<NodePriority>();
-            Previous = new List<KeyValuePair<string, string>>();
+            PathSteps = new List<PathStep>();
         }
         public class Node
         {
             public string Name { get; set; }
-            public List<KeyValuePair<string, int>> Edges { get; set; }
+            public List<NodeDistance> Edges { get; set; }
 
             public Node(string name) {
                 Name = name;
-                Edges = new List<KeyValuePair<string, int>>();
+                Edges = new List<NodeDistance>();
             }
         }
 
@@ -36,8 +36,8 @@ namespace Dijkstra
         }
         public void AddEdge(string V1, string V2, int weight) {
             foreach (var node in Vertexes.Values) {
-                if (node.Name == V1) node.Edges.Add(new KeyValuePair<string, int>(V2, weight));
-                if (node.Name == V2) node.Edges.Add(new KeyValuePair<string, int>(V1, weight));
+                if (node.Name == V1) node.Edges.Add(new NodeDistance(V2, weight));
+                if (node.Name == V2) node.Edges.Add(new NodeDistance(V1, weight));
             }
         }
         #region Dijkstra
@@ -51,7 +51,7 @@ namespace Dijkstra
                     Distances.Add(new NodeDistance(node.Name, int.MaxValue));
                     PriorityQueue.Add(new NodePriority(node.Name, int.MaxValue));
                 }
-                Previous.Add(new KeyValuePair<string, string>(node.Name, null));
+                PathSteps.Add(new PathStep(node.Name, null));
             }
             PriorityQueue.Sort((x, y) => x.Priority.CompareTo(y.Priority));
             //As long as there's smth to visit
@@ -65,8 +65,8 @@ namespace Dijkstra
                         Console.WriteLine(item.Node + ":" + item.Distance);
                     }
                     Console.WriteLine("Previous:");
-                    foreach (var item in Previous) {
-                        Console.WriteLine(item.Key + ":" + item.Value);
+                    foreach (var pathstep in PathSteps) {
+                        Console.WriteLine(pathstep.Location + ":" + pathstep.PreviousStep);
                     }
                     var path = PrintShortestPath(end, start, "");
                     path.Reverse();
@@ -83,8 +83,8 @@ namespace Dijkstra
                         var nextNode = Vertexes[lowest].Edges[index];
                         //calculate new distance to neighboring node
                         var candidate = Distances.Where(x => x.Node == lowest).FirstOrDefault();
-                        var addDistance = candidate.Distance + nextNode.Value;
-                        var nextNeighbor = nextNode.Key;
+                        var addDistance = candidate.Distance + nextNode.Distance;
+                        var nextNeighbor = nextNode.Node;
                         if (addDistance < Distances.Where(x => x.Node == nextNeighbor).Select(x => x.Distance).FirstOrDefault()) {
                             var oldDistance = Distances.Where(x => x.Node == nextNeighbor).FirstOrDefault();
                             //updating new smallest distance to neighbor
@@ -92,10 +92,10 @@ namespace Dijkstra
                             Distances.Remove(oldDistance);
                             Distances.Add(newDistance);
                             //update Previous - how we got to neighbor
-                            var previous = Previous.Where(x => x.Key == oldDistance.Node).FirstOrDefault();
-                            var newPreviousPair = new KeyValuePair<string, string>(previous.Key, lowest);
-                            Previous.Remove(previous);
-                            Previous.Add(newPreviousPair);
+                            var previous = PathSteps.Where(x => x.Location == oldDistance.Node).FirstOrDefault();
+                            var newPreviousPair = new PathStep(previous.Location, lowest);
+                            PathSteps.Remove(previous);
+                            PathSteps.Add(newPreviousPair);
                             //update the priority queue
                             var oldPriority = PriorityQueue.Where(x => x.Node == nextNeighbor).FirstOrDefault();
                             var newPriority = new NodePriority(nextNeighbor, addDistance);
@@ -112,9 +112,9 @@ namespace Dijkstra
             if (end == start) {
                 return path.Remove(path.Length - 3);               
             };
-            var endNode = Previous.Where(x => x.Key == end).FirstOrDefault();
-            path += endNode.Value + "-->";
-            return PrintShortestPath(endNode.Value, start, path);
+            var endNode = PathSteps.Where(x => x.Location == end).FirstOrDefault();
+            path += endNode.PreviousStep + "-->";
+            return PrintShortestPath(endNode.PreviousStep, start, path);
 
         }
         #endregion
