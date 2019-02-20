@@ -118,10 +118,6 @@ namespace Dijkstra
             return PrintShortestPath(endNode.Value, start, path);
 
         }
-        public List<KeyValuePair<string, int>> GetOrderedPriority() {
-
-            return PriorityQueue.OrderBy(x => x.Value).ToList();
-        }
         #endregion
 
     }
