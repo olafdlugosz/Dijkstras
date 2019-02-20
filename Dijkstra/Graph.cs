@@ -8,12 +8,12 @@ namespace Dijkstra
     public class Graph<T>
     {
         public Dictionary<string, Node> Vertexes { get; set; }
-        public List<KeyValuePair<string, int>> Distances { get; set; }
+        public List<NodeDistance> Distances { get; set; }
         public List<KeyValuePair<string, int>> PriorityQueue { get; set; }
         public List<KeyValuePair<string, string>> Previous { get; set; }
         public Graph() {
             Vertexes = new Dictionary<string, Node>();
-            Distances = new List<KeyValuePair<string, int>>();
+            Distances = new List<NodeDistance>();
             PriorityQueue = new List<KeyValuePair<string, int>>();
             Previous = new List<KeyValuePair<string, string>>();
         }
@@ -45,10 +45,10 @@ namespace Dijkstra
             //Initial State
             foreach (var node in Vertexes.Values) {
                 if (node.Name == start) {
-                    Distances.Add(new KeyValuePair<string, int>(node.Name, 0));
+                    Distances.Add(new NodeDistance(node.Name, 0));
                     PriorityQueue.Add(new KeyValuePair<string, int>(node.Name, 0));
                 } else {
-                    Distances.Add(new KeyValuePair<string, int>(node.Name, int.MaxValue));
+                    Distances.Add(new NodeDistance(node.Name, int.MaxValue));
                     PriorityQueue.Add(new KeyValuePair<string, int>(node.Name, int.MaxValue));
                 }
                 Previous.Add(new KeyValuePair<string, string>(node.Name, null));
@@ -62,7 +62,7 @@ namespace Dijkstra
                     //We're DONE;
                     Console.WriteLine("Distances");
                     foreach (var item in Distances) {
-                        Console.WriteLine(item.Key + ":" + item.Value);
+                        Console.WriteLine(item.Node + ":" + item.Distance);
                     }
                     Console.WriteLine("Previous:");
                     foreach (var item in Previous) {
@@ -74,25 +74,25 @@ namespace Dijkstra
                     break;
                 };
                 if (lowest != null || Distances
-                    .Where(x => x.Key == lowest)
-                    .Select(x => x.Value)
+                    .Where(x => x.Node == lowest)
+                    .Select(x => x.Distance)
                     .FirstOrDefault() != int.MaxValue) {
                     foreach (var neighbor in Vertexes[lowest].Edges) {
                         //Find neighboring nodes
                         var index = Vertexes[lowest].Edges.IndexOf(neighbor);
                         var nextNode = Vertexes[lowest].Edges[index];
                         //calculate new distance to neighboring node
-                        var candidate = Distances.Where(x => x.Key == lowest).FirstOrDefault();
-                        var addDistance = candidate.Value + nextNode.Value;
+                        var candidate = Distances.Where(x => x.Node == lowest).FirstOrDefault();
+                        var addDistance = candidate.Distance + nextNode.Value;
                         var nextNeighbor = nextNode.Key;
-                        if (addDistance < Distances.Where(x => x.Key == nextNeighbor).Select(x => x.Value).FirstOrDefault()) {
-                            var update = Distances.Where(x => x.Key == nextNeighbor).FirstOrDefault();
+                        if (addDistance < Distances.Where(x => x.Node == nextNeighbor).Select(x => x.Distance).FirstOrDefault()) {
+                            var oldDistance = Distances.Where(x => x.Node == nextNeighbor).FirstOrDefault();
                             //updating new smallest distance to neighbor
-                            var newPair = new KeyValuePair<string, int>(update.Key, addDistance);
-                            Distances.Remove(update);
-                            Distances.Add(newPair);
+                            var newDistance = new NodeDistance(oldDistance.Node, addDistance);
+                            Distances.Remove(oldDistance);
+                            Distances.Add(newDistance);
                             //update Previous - how we got to neighbor
-                            var previous = Previous.Where(x => x.Key == update.Key).FirstOrDefault();
+                            var previous = Previous.Where(x => x.Key == oldDistance.Node).FirstOrDefault();
                             var newPreviousPair = new KeyValuePair<string, string>(previous.Key, lowest);
                             Previous.Remove(previous);
                             Previous.Add(newPreviousPair);
@@ -110,8 +110,7 @@ namespace Dijkstra
         }
         public string PrintShortestPath(string end, string start, string path) {
             if (end == start) {
-                return path.Remove(path.Length - 3);
-               
+                return path.Remove(path.Length - 3);               
             };
             var endNode = Previous.Where(x => x.Key == end).FirstOrDefault();
             path += endNode.Value + "-->";

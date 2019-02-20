@@ -25,7 +25,7 @@ namespace Dijkstra
             g.AddEdge("D", "E", 3);
 
 
-            g.Dijkstra("A","D");
+            g.Dijkstra("A","F");
 
 
             foreach (var item in g.Vertexes.Values) {
@@ -39,7 +39,7 @@ namespace Dijkstra
             }
             Console.WriteLine("===");
             foreach (var item in g.Distances) {
-                Console.WriteLine(item.Key + ":" + item.Value);
+                Console.WriteLine(item.Node + ":" + item.Distance);
             }
             Console.ReadLine();
         }
