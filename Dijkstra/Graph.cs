@@ -9,12 +9,12 @@ namespace Dijkstra
     {
         public Dictionary<string, Node> Vertexes { get; set; }
         public List<NodeDistance> Distances { get; set; }
-        public List<KeyValuePair<string, int>> PriorityQueue { get; set; }
+        public List<NodePriority> PriorityQueue { get; set; }
         public List<KeyValuePair<string, string>> Previous { get; set; }
         public Graph() {
             Vertexes = new Dictionary<string, Node>();
             Distances = new List<NodeDistance>();
-            PriorityQueue = new List<KeyValuePair<string, int>>();
+            PriorityQueue = new List<NodePriority>();
             Previous = new List<KeyValuePair<string, string>>();
         }
         public class Node
@@ -46,17 +46,17 @@ namespace Dijkstra
             foreach (var node in Vertexes.Values) {
                 if (node.Name == start) {
                     Distances.Add(new NodeDistance(node.Name, 0));
-                    PriorityQueue.Add(new KeyValuePair<string, int>(node.Name, 0));
+                    PriorityQueue.Add(new NodePriority(node.Name, 0));
                 } else {
                     Distances.Add(new NodeDistance(node.Name, int.MaxValue));
-                    PriorityQueue.Add(new KeyValuePair<string, int>(node.Name, int.MaxValue));
+                    PriorityQueue.Add(new NodePriority(node.Name, int.MaxValue));
                 }
                 Previous.Add(new KeyValuePair<string, string>(node.Name, null));
             }
-            PriorityQueue.Sort((x, y) => x.Value.CompareTo(y.Value));
+            PriorityQueue.Sort((x, y) => x.Priority.CompareTo(y.Priority));
             //As long as there's smth to visit
             while (PriorityQueue.Count > 0) {
-                var lowest = PriorityQueue[0].Key;
+                var lowest = PriorityQueue[0].Node;
                 PriorityQueue.RemoveAt(0);
                 if (lowest == end) {
                     //We're DONE;
@@ -97,12 +97,12 @@ namespace Dijkstra
                             Previous.Remove(previous);
                             Previous.Add(newPreviousPair);
                             //update the priority queue
-                            var dequeue = PriorityQueue.Where(x => x.Key == nextNeighbor).FirstOrDefault();
-                            var newPriority = new KeyValuePair<string, int>(nextNeighbor, addDistance);
-                            PriorityQueue.Remove(dequeue);
+                            var oldPriority = PriorityQueue.Where(x => x.Node == nextNeighbor).FirstOrDefault();
+                            var newPriority = new NodePriority(nextNeighbor, addDistance);
+                            PriorityQueue.Remove(oldPriority);
                             PriorityQueue.Add(newPriority);
 
-                            PriorityQueue.Sort((x, y) => x.Value.CompareTo(y.Value));
+                            PriorityQueue.Sort((x, y) => x.Priority.CompareTo(y.Priority));
                         }
                     }
                 }
