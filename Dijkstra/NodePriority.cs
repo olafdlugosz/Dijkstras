@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Dijkstra
 {
-    public struct NodePriority
+    public class NodePriority
     {
-        public NodePriority(string node, int priority) : this() {
+        public NodePriority(string node, int priority) {
             Node = node;
             Priority = priority;
         }

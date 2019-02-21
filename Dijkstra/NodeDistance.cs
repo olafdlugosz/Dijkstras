@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Dijkstra
 {
-    public struct NodeDistance
+    public class NodeDistance
     {
         public string Node { get; set; }
         public int Distance { get; set; }
-        public NodeDistance(string node, int distance) : this() {
+        public NodeDistance(string node, int distance) {
             Node = node;
             Distance = distance;
         }

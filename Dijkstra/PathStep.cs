@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Dijkstra
 {
-   public struct PathStep
+   public class PathStep
     {
-        public PathStep(string location, string previousStep) : this() {
+        public PathStep(string location, string previousStep) {
             Location = location;
             PreviousStep = previousStep;
         }
