@@ -64,7 +64,7 @@ namespace Dijkstra
                     foreach (var item in Distances) {
                         Console.WriteLine(item.Node + ":" + item.Distance);
                     }
-                    Console.WriteLine("Previous:");
+                    Console.WriteLine("PathSteps:");
                     foreach (var pathstep in PathSteps) {
                         Console.WriteLine(pathstep.Location + ":" + pathstep.PreviousStep);
                     }
@@ -91,7 +91,7 @@ namespace Dijkstra
                             var newDistance = new NodeDistance(oldDistance.Node, addDistance);
                             Distances.Remove(oldDistance);
                             Distances.Add(newDistance);
-                            //update Previous - how we got to neighbor
+                            //update PathSteps - how we got to neighbor
                             var previous = PathSteps.Where(x => x.Location == oldDistance.Node).FirstOrDefault();
                             var newPreviousPair = new PathStep(previous.Location, lowest);
                             PathSteps.Remove(previous);
@@ -112,9 +112,9 @@ namespace Dijkstra
             if (end == start) {
                 return path.Remove(path.Length - 3);               
             };
-            var endNode = PathSteps.Where(x => x.Location == end).FirstOrDefault();
-            path += endNode.PreviousStep + "<--";
-            return PrintShortestPath(endNode.PreviousStep, start, path);
+            var nextNode = PathSteps.Where(x => x.Location == end).FirstOrDefault();
+            path += nextNode.PreviousStep + "<--";
+            return PrintShortestPath(nextNode.PreviousStep, start, path);
 
         }
         #endregion
